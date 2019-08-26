@@ -8,3 +8,4 @@
 简单说说这个项目的技术覆盖，项目使用的Maven控制Jar包版本依赖关系，使用的IDE为IDEA
 框架使用Springmvc、Spring、Mabatis（SSM）
 
+https://github.com/0wlc/Noob-program-/wiki
