@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper">
+	
+	<resultMap id="rsRole" type="com.ozc.entity.Role">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="createDate" column="CREATE_DATE" />
+	</resultMap>
+	
+	<sql id="sql_column_items">
+		ID, 
+		NAME, 
+		CREATE_DATE
+	</sql>
+	
+	
+	<select id="findById" resultMap="rsRole" parameterType="java.lang.Long">
+		select  <include refid="sql_column_items"/> from t_role
+		<where>
+			ID = #{id}
+		</where>
+	</select>
+	
+	
+	<select id="findList" resultMap="rsRole">
+		select  <include refid="sql_column_items"/> from t_role
+		<where>
+			<if test="Role != null and Role.id != null ">  
+				and ID = #{Role.id}
+			</if>
+			<if test="Role != null and Role.name != null and Role.name != '' ">  
+				and NAME like '%#{Role.name}%'
+			</if>
+			<if test="createDateBegin != null" >
+				<![CDATA[
+				and CREATE_DATE >= #{createDateBegin} 
+				]]> 
+			</if>
+			<if test="createDateEnd != null" > 
+				<![CDATA[
+				and CREATE_DATE <= #{createDateEnd}
+				]]> 
+			</if>
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<insert id="add" parameterType="com.ozc.entity.Role">
+		insert into t_role 
+			(
+			ID, 
+			NAME, 
+			CREATE_DATE
+			) 
+		values
+			(
+			seq_role.nextval, 
+			#{name, jdbcType=VARCHAR}, 
+			sysdate
+			)
+	</insert>
+	
+	<update id="update" parameterType="com.ozc.entity.Role">
+		update t_role
+			 <set> 
+				<if test=" name != null ">NAME = #{name, jdbcType=VARCHAR}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from t_role
+		<where>
+			ID = #{id}
+		</where>
+	</delete>
+	
+	<insert id="addR2M" parameterType="map">
+		insert into t_role2menu(role_id,menu_id)
+		values(#{roleId},#{menuId})
+	</insert>
+	
+	<delete id="deleteR2M" parameterType="map">
+		delete from t_role2menu where role_id=#{roleId} and menu_id=#{menuId}
+	</delete>
+</mapper>

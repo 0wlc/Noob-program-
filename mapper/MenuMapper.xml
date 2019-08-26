@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MenuMapper">
+	
+	<resultMap id="rsMenu" type="com.ozc.entity.Menu">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="url" column="URL" />
+		<result property="pid" column="PID" />
+		<result property="mlevel" column="MLEVEL" />
+		<result property="orderNo" column="ORDER_NO" />
+		<result property="createDate" column="CREATE_DATE" />
+	</resultMap>
+	
+	<sql id="sql_column_items">
+		ID, 
+		NAME, 
+		URL, 
+		PID, 
+		MLEVEL, 
+		ORDER_NO, 
+		CREATE_DATE
+	</sql>
+	
+	
+	<select id="findById" resultMap="rsMenu" parameterType="java.lang.Long">
+		select  <include refid="sql_column_items"/> from t_menu
+		<where>
+			ID = #{id}
+		</where>
+	</select>
+	<!-- 登录根据角色获取菜单 -->
+	<select id="getMenusByRoleId" resultMap="rsMenu" parameterType="java.lang.Long">
+		select * from t_menu a,t_role2menu b where a.id = b.menu_id 
+		and b.role_id = #{id}
+	</select>
+	
+	
+	<select id="findList" resultMap="rsMenu">
+		select  <include refid="sql_column_items"/> from t_menu
+		<where>
+			<if test="Menu != null and Menu.id != null ">  
+				and ID = #{Menu.id}
+			</if>
+			<if test="Menu != null and Menu.name != null and Menu.name != '' ">  
+				and NAME like '%#{Menu.name}%'
+			</if>
+			<if test="Menu != null and Menu.url != null and Menu.url != '' ">  
+				and URL = #{Menu.url}
+			</if>
+			<if test="Menu != null and Menu.pid != null ">  
+				and PID = #{Menu.pid}
+			</if>
+			<if test="Menu != null and Menu.mlevel != null and Menu.mlevel != 0 ">  
+				and MLEVEL = #{Menu.mlevel}
+			</if>
+			<if test="Menu != null and Menu.orderNo != null and Menu.orderNo != 0 ">  
+				and ORDER_NO = #{Menu.orderNo}
+			</if>
+			<if test="createDateBegin != null" >
+				<![CDATA[
+				and CREATE_DATE >= #{createDateBegin} 
+				]]> 
+			</if>
+			<if test="createDateEnd != null" > 
+				<![CDATA[
+				and CREATE_DATE <= #{createDateEnd}
+				]]> 
+			</if>
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<insert id="add" parameterType="com.ozc.entity.Menu">
+		insert into t_menu 
+			(
+			ID, 
+			NAME, 
+			URL, 
+			PID, 
+			MLEVEL, 
+			ORDER_NO, 
+			CREATE_DATE
+			) 
+		values
+			(
+			seq_nenu.nextval, 
+			#{name, jdbcType=VARCHAR}, 
+			#{url, jdbcType=VARCHAR}, 
+			#{pid, jdbcType=NUMERIC}, 
+			#{mlevel, jdbcType=NUMERIC}, 
+			#{orderNo, jdbcType=NUMERIC}, 
+			sysdate
+			)
+	</insert>
+	
+	<update id="update" parameterType="com.ozc.entity.Menu">
+		update t_menu
+			 <set> 
+				<if test=" name != null ">NAME = #{name, jdbcType=VARCHAR}, </if>
+				<if test=" url != null ">URL = #{url, jdbcType=VARCHAR}, </if>
+				<if test=" pid != null ">PID = #{pid, jdbcType=NUMERIC}, </if>
+				<if test=" mlevel != null and mlevel != 0 ">MLEVEL = #{mlevel, jdbcType=NUMERIC}, </if>
+				<if test=" orderNo != null and orderNo != 0  ">ORDER_NO = #{orderNo, jdbcType=NUMERIC}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from t_menu
+		<where>
+			ID = #{id}
+		</where>
+	</delete>
+	
+</mapper>

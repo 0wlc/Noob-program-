@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DictMapper">
+	
+	<resultMap id="rsDict" type="com.ozc.entity.Dict">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="dkey" column="DKEY" />
+		<result property="dval" column="DVAL" />
+		<result property="useFlag" column="USE_FLAG" />
+		<result property="orderNo" column="ORDER_NO" />
+		<result property="createDate" column="CREATE_DATE" />
+	</resultMap>
+	
+	<sql id="sql_column_items">
+		ID, 
+		NAME, 
+		DKEY, 
+		DVAL, 
+		USE_FLAG, 
+		ORDER_NO, 
+		CREATE_DATE
+	</sql>
+	
+	
+	<select id="findById" resultMap="rsDict" parameterType="java.lang.Long">
+		select  <include refid="sql_column_items"/> from t_dict
+		<where>
+			ID = #{id}
+		</where>
+	</select>
+	
+	
+	<select id="findList" resultMap="rsDict">
+		select  <include refid="sql_column_items"/> from t_dict
+		<where>
+			<if test="Dict != null and Dict.id != null ">  
+				and ID = #{Dict.id}
+			</if>
+			<if test="Dict != null and Dict.name != null and Dict.name != '' ">  
+				and NAME like '%#{Dict.name}%'
+			</if>
+			<if test="Dict != null and Dict.dkey != null and Dict.dkey != '' ">  
+				and DKEY = #{Dict.dkey}
+			</if>
+			<if test="Dict != null and Dict.dval != null and Dict.dval != '' ">  
+				and DVAL = #{Dict.dval}
+			</if>
+			<if test="Dict != null and Dict.useFlag != null and Dict.useFlag != 0">  
+				and USE_FLAG = #{Dict.useFlag}
+			</if>
+			<if test="Dict != null and Dict.orderNo != null and Dict.orderNo != 0 ">  
+				and ORDER_NO = #{Dict.orderNo}
+			</if>
+			<if test="createDateBegin != null" >
+				<![CDATA[
+				and CREATE_DATE >= #{createDateBegin} 
+				]]> 
+			</if>
+			<if test="createDateEnd != null" > 
+				<![CDATA[
+				and CREATE_DATE <= #{createDateEnd}
+				]]> 
+			</if>
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<insert id="add" parameterType="com.ozc.entity.Dict">
+		insert into t_dict 
+			(
+			ID, 
+			NAME, 
+			DKEY, 
+			DVAL, 
+			USE_FLAG, 
+			ORDER_NO, 
+			CREATE_DATE
+			) 
+		values
+			(
+			seq_dict.nextval, 
+			#{name, jdbcType=VARCHAR}, 
+			#{dkey, jdbcType=VARCHAR}, 
+			#{dval, jdbcType=VARCHAR}, 
+			#{useFlag, jdbcType=NUMERIC}, 
+			#{orderNo, jdbcType=NUMERIC}, 
+			sysdate
+			)
+	</insert>
+	
+	<update id="update" parameterType="com.ozc.entity.Dict">
+		update t_dict
+			 <set> 
+				<if test=" name != null ">NAME = #{name, jdbcType=VARCHAR}, </if>
+				<if test=" dkey != null ">DKEY = #{dkey, jdbcType=VARCHAR}, </if>
+				<if test=" dval != null ">DVAL = #{dval, jdbcType=VARCHAR}, </if>
+				<if test=" useFlag != null and useFlag != 0 ">USE_FLAG = #{useFlag, jdbcType=NUMERIC}, </if>
+				<if test=" orderNo != null and orderNo != 0 ">ORDER_NO = #{orderNo, jdbcType=NUMERIC}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from t_dict
+		<where>
+			ID = #{id}
+		</where>
+	</delete>
+	
+</mapper>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherMapper">
+	
+	<resultMap id="rsTeacher" type="com.ozc.entity.Teacher">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="sex" column="SEX" />
+		<result property="birthday" column="BIRTHDAY" />
+		<result property="workDate" column="WORK_DATE" />
+		<result property="specialty" column="SPECIALTY" />
+		<result property="tlevel" column="TLEVEL" />
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="courseId" column="COURSE_ID" />
+	</resultMap>
+	
+	<sql id="sql_column_items">
+		ID, 
+		NAME, 
+		SEX, 
+		BIRTHDAY, 
+		WORK_DATE, 
+		SPECIALTY, 
+		TLEVEL, 
+		CREATE_DATE, 
+		COURSE_ID
+	</sql>
+	
+	
+	<select id="findById" resultMap="rsTeacher" parameterType="java.lang.Long">
+		select  <include refid="sql_column_items"/> from t_teacher
+		<where>
+			ID = #{id}
+		</where>
+	</select>
+	
+	
+	<select id="findList" resultMap="rsTeacher">
+		select  <include refid="sql_column_items"/> from t_teacher
+		<where>
+			<if test="Teacher != null and Teacher.id != null ">  
+				and ID = #{Teacher.id}
+			</if>
+			<if test="Teacher != null and Teacher.name != null and Teacher.name != '' ">  
+				and NAME like '%#{Teacher.name}%'
+			</if>
+			<if test="Teacher != null and Teacher.sex != null and Teacher.sex != 0 ">  
+				and SEX = #{Teacher.sex}
+			</if>
+			<if test="birthdayBegin != null" >
+				<![CDATA[
+				and BIRTHDAY >= #{birthdayBegin} 
+				]]> 
+			</if>
+			<if test="birthdayEnd != null" > 
+				<![CDATA[
+				and BIRTHDAY <= #{birthdayEnd}
+				]]> 
+			</if>
+			<if test="workDateBegin != null" >
+				<![CDATA[
+				and WORK_DATE >= #{workDateBegin} 
+				]]> 
+			</if>
+			<if test="workDateEnd != null" > 
+				<![CDATA[
+				and WORK_DATE <= #{workDateEnd}
+				]]> 
+			</if>
+			<if test="Teacher != null and Teacher.specialty != null and Teacher.specialty != '' ">  
+				and SPECIALTY like '%#{Teacher.specialty}%'
+			</if>
+			<if test="Teacher != null and Teacher.tlevel != null and Teacher.tlevel != 0 ">  
+				and TLEVEL = #{Teacher.tlevel}
+			</if>
+			<if test="createDateBegin != null" >
+				<![CDATA[
+				and CREATE_DATE >= #{createDateBegin} 
+				]]> 
+			</if>
+			<if test="createDateEnd != null" > 
+				<![CDATA[
+				and CREATE_DATE <= #{createDateEnd}
+				]]> 
+			</if>
+			<if test="Teacher != null and Teacher.courseId != null ">  
+				and COURSE_ID = #{Teacher.courseId}
+			</if>
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<insert id="add" parameterType="com.ozc.entity.Teacher">
+		insert into t_teacher 
+			(
+			ID, 
+			NAME, 
+			SEX, 
+			BIRTHDAY, 
+			WORK_DATE, 
+			SPECIALTY, 
+			TLEVEL, 
+			CREATE_DATE, 
+			COURSE_ID
+			) 
+		values
+			(
+			seq_teacher.nextval, 
+			#{name, jdbcType=VARCHAR}, 
+			#{sex, jdbcType=NUMERIC}, 
+			#{birthday, jdbcType=TIMESTAMP}, 
+			#{workDate, jdbcType=TIMESTAMP}, 
+			#{specialty, jdbcType=VARCHAR}, 
+			#{tlevel, jdbcType=NUMERIC}, 
+			sysdate, 
+			#{courseId, jdbcType=NUMERIC}
+			)
+	</insert>
+	
+	<update id="update" parameterType="com.ozc.entity.Teacher">
+		update t_teacher
+			 <set> 
+				<if test=" name != null ">NAME = #{name, jdbcType=VARCHAR}, </if>
+				<if test=" sex != null and sex != 0 ">SEX = #{sex, jdbcType=NUMERIC}, </if>
+				<if test=" birthday != null ">BIRTHDAY = #{birthday, jdbcType=TIMESTAMP}, </if>
+				<if test=" workDate != null ">WORK_DATE = #{workDate, jdbcType=TIMESTAMP}, </if>
+				<if test=" specialty != null ">SPECIALTY = #{specialty, jdbcType=VARCHAR}, </if>
+				<if test=" tlevel != null and tlevel != 0 ">TLEVEL = #{tlevel, jdbcType=NUMERIC}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				<if test=" courseId != null and courseId != 0 ">COURSE_ID = #{courseId, jdbcType=NUMERIC}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from t_teacher
+		<where>
+			ID = #{id}
+		</where>
+	</delete>
+	
+</mapper>

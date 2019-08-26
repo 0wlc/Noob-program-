@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<!-- 全局设置 -->
+	<settings>
+		<!--按照以下规则映射:把表字段名的下划线删除，并且单词首字母变大写, 得到相应属性名,默认是false -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+	<!-- 配置别名 -->
+	<typeAliases>
+		<!-- 查找类时，默认到该包下找 -->
+		<package name="com.ozc.entity" />
+	</typeAliases>
+	<!-- 分页插件 -->
+	<plugins>
+		<!-- com.github.pagehelper为PageHelper类所在包 -->
+		<plugin interceptor="com.github.pagehelper.PageHelper">
+			<property name="dialect" value="oracle"/>
+		</plugin>
+	</plugins>
+</configuration>

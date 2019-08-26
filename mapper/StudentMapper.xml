@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StudentMapper">
+	
+	<resultMap id="rsStudent" type="com.ozc.entity.Student">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="sex" column="SEX" />
+		<result property="birthday" column="BIRTHDAY" />
+		<result property="snative" column="SNATIVE" />
+		<result property="classId" column="CLASS_ID" />
+		<result property="createDate" column="CREATE_DATE" />
+	</resultMap>
+	
+	
+	<select id="findById" resultMap="rsStudent" parameterType="java.lang.Long">
+		select a.*,b.name className from t_student a,t_class b
+		<where>
+			a.ID = #{id} and a.class_id = b.id
+		</where>
+	</select>
+	
+	
+	<select id="findList" resultMap="rsStudent">
+		select a.*,b.name className from t_student a,t_class b
+		<where>
+			<if test="Student != null and Student.id != null ">  
+				and ID = #{Student.id}
+			</if>
+			<if test="Student != null and Student.name != null and Student.name != '' ">  
+				and a.NAME like '%#{Student.name}%'
+			</if>
+			<if test="Student != null and Student.sex != null and Student.sex != 0 ">  
+				and a.SEX = #{Student.sex}
+			</if>
+			<if test="birthdayBegin != null" >
+				<![CDATA[
+				and BIRTHDAY >= #{birthdayBegin} 
+				]]> 
+			</if>
+			<if test="birthdayEnd != null" > 
+				<![CDATA[
+				and BIRTHDAY <= #{birthdayEnd}
+				]]> 
+			</if>
+			<if test="Student != null and Student.snative != null and Student.snative != '' ">  
+				and SNATIVE = #{Student.snative}
+			</if>
+			<if test="Student != null and Student.classId != null ">  
+				and b.CLASS_ID = #{Student.classId}
+			</if>
+			<if test="Student != null and Student.className != null ">  
+				and b.name like '%${Student.className}%'
+			</if>
+			<if test="createDateBegin != null" >
+				<![CDATA[
+				and CREATE_DATE >= #{createDateBegin} 
+				]]> 
+			</if>
+			<if test="createDateEnd != null" > 
+				<![CDATA[
+				and CREATE_DATE <= #{createDateEnd}
+				]]> 
+			</if>
+				and a.class_id = b.id
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<insert id="add" parameterType="com.ozc.entity.Student">
+		insert into t_student 
+			(
+			ID, 
+			NAME, 
+			SEX, 
+			BIRTHDAY, 
+			SNATIVE, 
+			CLASS_ID, 
+			CREATE_DATE
+			) 
+		values
+			(
+			seq_student.nextval, 
+			#{name, jdbcType=VARCHAR}, 
+			#{sex, jdbcType=NUMERIC}, 
+			#{birthday, jdbcType=TIMESTAMP}, 
+			#{snative, jdbcType=VARCHAR}, 
+			#{classId, jdbcType=NUMERIC}, 
+			sysdate
+			)
+	</insert>
+	
+	<update id="update" parameterType="com.ozc.entity.Student">
+		update t_student
+			 <set> 
+				<if test=" name != null ">NAME = #{name, jdbcType=VARCHAR}, </if>
+				<if test=" sex != null and sex != 0 ">SEX = #{sex, jdbcType=NUMERIC}, </if>
+				<if test=" birthday != null ">BIRTHDAY = #{birthday, jdbcType=TIMESTAMP}, </if>
+				<if test=" snative != null ">SNATIVE = #{snative, jdbcType=VARCHAR}, </if>
+				<if test=" classId != null and classId != 0 ">CLASS_ID = #{classId, jdbcType=NUMERIC}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from t_student
+		<where>
+			ID = #{id}
+		</where>
+	</delete>
+</mapper>

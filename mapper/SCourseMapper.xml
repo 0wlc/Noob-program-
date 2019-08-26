@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SCourseMapper">
+	
+	<resultMap id="rsSCourse" type="com.ozc.entity.SCourse">
+		<result property="id" column="ID" />
+		<result property="studentId" column="STUDENT_ID" />
+		<result property="courseId" column="COURSE_ID" />
+		<result property="score" column="SCORE" />
+		<result property="remark" column="REMARK" />
+		<result property="createDate" column="CREATE_DATE" />
+	</resultMap>
+	
+	<select id="findById" resultMap="rsSCourse" parameterType="java.lang.Long">
+		select a.*,b.name studentName,c.name courseName,c.cyear,d.name teacherName 
+		from t_stu_course a,t_student b,t_course c,t_teacher d
+		<where>
+			a.ID = #{id} and a.student_id=b.id and a.course_id=c.id and c.id=d.id
+		</where>
+	</select>
+	
+	
+	<select id="findList" resultMap="rsSCourse">
+		select a.*,b.name studentName,c.name courseName,c.cyear cyear,c.sch_term schTerm,c.state state,d.name teacherName
+		from t_stu_course a,t_student b,t_course c,t_teacher d
+		<where>
+			<if test="Score != null and Score.id != null ">  
+				and ID = #{Score.id}
+			</if>
+			<if test="Score != null and Score.studentName != null ">  
+				and b.NAME liek '%#{Score.studentName}%'
+			</if>
+			<if test="Score != null and Score.courseName != null ">  
+				and c.NAME like '%#{Score.courseName}%'
+			</if>
+			<if test="Score != null and Score.teacherName != null ">  
+				and d.NAME like '%#{Score.teacherName}%'
+			</if>
+			<if test="Score != null and Score.cyear != null and Score.cyear != 0 ">  
+				and c.CYEAR = #{Score.cyear}
+			</if>
+			<if test="Score != null and Score.score != null ">  
+				and SCORE = #{Score.score}
+			</if>
+			<if test="Score != null and Score.remark != null and Score.remark != '' ">  
+				and REMARK = #{Score.remark}
+			</if>
+			<if test="createDateBegin != null" >
+				<![CDATA[
+				and CREATE_DATE >= #{createDateBegin} 
+				]]> 
+			</if>
+			<if test="createDateEnd != null" > 
+				<![CDATA[
+				and CREATE_DATE <= #{createDateEnd}
+				]]> 
+			</if>
+				and a.student_id=b.id and a.course_id=c.id and c.id=d.id
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<insert id="add" parameterType="com.ozc.entity.SCourse">
+		insert into t_stu_course 
+			(
+			ID, 
+			STUDENT_ID, 
+			COURSE_ID, 
+			SCORE, 
+			REMARK, 
+			CREATE_DATE
+			) 
+		values
+			(
+			seq_stu_course.nextval, 
+			#{studentId, jdbcType=NUMERIC}, 
+			#{courseId, jdbcType=NUMERIC}, 
+			#{score, jdbcType=NUMERIC}, 
+			#{remark, jdbcType=VARCHAR}, 
+			sysdate
+			)
+	</insert>
+	
+	<update id="update" parameterType="com.ozc.entity.SCourse">
+		update t_stu_course
+			 <set> 
+				<if test=" studentId != null and studentId != 0 ">STUDENT_ID = #{studentId, jdbcType=NUMERIC}, </if>
+				<if test=" courseId != null and courseId != 0 ">COURSE_ID = #{courseId, jdbcType=NUMERIC}, </if>
+				<if test=" score != null and score != 0 ">SCORE = #{score, jdbcType=NUMERIC}, </if>
+				<if test=" remark != null ">REMARK = #{remark, jdbcType=VARCHAR}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from t_stu_course
+		<where>
+			ID = #{id}
+		</where>
+	</delete>
+	
+</mapper>

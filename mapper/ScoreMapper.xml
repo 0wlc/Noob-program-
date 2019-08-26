@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ScoreMapper">
+	
+	<resultMap id="rsScore" type="com.ozc.entity.Score">
+		<result property="id" column="ID" />
+		<result property="studentId" column="STUDENT_ID" />
+		<result property="courseId" column="COURSE_ID" />
+		<result property="score" column="SCORE" />
+	</resultMap>
+	
+	<select id="findById" resultMap="rsScore" parameterType="java.lang.Long">
+		select a.*,b.name studentName,c.name courseName,c.cyear,d.name teacherName,e.name className 
+		from t_stu_course a,t_student b,t_course c,t_teacher d,t_class e
+		<where>
+			a.ID = #{id} and a.student_id=b.id and a.course_id=c.id and c.id=d.id and b.class_id=e.id
+		</where>
+	</select>
+	
+	
+	<select id="findList" resultMap="rsScore">
+		select a.*,b.name studentName,c.name courseName,c.cyear,c.sch_term schTerm,c.state,d.name teacherName
+		from t_stu_course a,t_student b,t_course c,t_teacher d
+		<where>
+			<if test="Score != null and Score.id != null ">  
+				and ID = #{Score.id}
+			</if>
+			<if test="Score != null and Score.studentName != null ">  
+				and b.NAME liek '%#{Score.studentName}%'
+			</if>
+			<if test="Score != null and Score.courseName != null ">  
+				and c.NAME like '%#{Score.courseName}%'
+			</if>
+			<if test="Score != null and Score.teacherName != null ">  
+				and d.NAME like '%#{Score.teacherName}%'
+			</if>
+			<if test="Score != null and Score.cyear != null and Score.cyear != 0 ">  
+				and c.CYEAR = #{Score.cyear}
+			</if>
+			<if test="Score != null and Score.score != null ">  
+				and SCORE = #{Score.score}
+			</if>
+			<if test="Score != null and Score.remark != null and Score.remark != '' ">  
+				and REMARK = #{Score.remark}
+			</if>
+				and a.student_id=b.id and a.course_id=c.id and c.id=d.id
+		</where>
+		<if test="order != null and order != '' ">  
+			order by ${order} ${sort}
+		</if>
+	</select>
+	
+	<update id="update" parameterType="com.ozc.entity.Score">
+		update t_stu_course
+			 <set> 
+				<if test=" studentId != null and studentId != 0 ">STUDENT_ID = #{studentId, jdbcType=NUMERIC}, </if>
+				<if test=" courseId != null and courseId != 0 ">COURSE_ID = #{courseId, jdbcType=NUMERIC}, </if>
+				<if test=" score != null and score != 0 ">SCORE = #{score, jdbcType=NUMERIC}, </if>
+				<if test=" remark != null ">REMARK = #{remark, jdbcType=VARCHAR}, </if>
+				<if test=" createDate != null ">CREATE_DATE = #{createDate, jdbcType=TIMESTAMP}, </if>
+				ID = #{id}
+		</set>
+			<where>
+				ID = #{id}
+			</where>
+	</update>
+	
+</mapper>
